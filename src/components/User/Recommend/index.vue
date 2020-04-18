@@ -1,6 +1,6 @@
 <template>
     <div id="svg-bg">
-        <Navbar/>
+        <Navbar ref="navbar"/>
 
         <b-col class="p-md-2 p-0 container">
             <b-container v-if="loading" class="vh-100 my-md-5 my-0 py-md-5 py-5">
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-    import Navbar from "@/components/Common/Navbar"
+    import Navbar from "@/components/Common/User/Navbar"
 
     export default {
         name: "index",

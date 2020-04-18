@@ -5,19 +5,14 @@ import VueResource from 'vue-resource'
 import Login from '@/components/Login/index'
 import Home from '@/components/User/index'
 import Recommend from '@/components/User/Recommend/index'
+import Admin from '@/components/Admin/index'
 
-import Navbar from '@/components/Common/Navbar'
 
 Vue.use(Router);
 Vue.use(VueResource);
 
 const router = new Router({
     routes: [
-        {
-            path: '/navbar',
-            name: '导航栏',
-            component: Navbar,
-        },
         {
             path: '/login',
             name: '登录',
@@ -38,6 +33,14 @@ const router = new Router({
             path: '/recommend',
             name: '推荐',
             component: Recommend,
+            meta: {
+                needLogin: true
+            }
+        },
+        {
+            path: '/admin',
+            name: '管理员主页',
+            component: Admin,
             meta: {
                 needLogin: true
             }

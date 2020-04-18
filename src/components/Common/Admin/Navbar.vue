@@ -1,26 +1,19 @@
 <template>
     <b-navbar id="nav-bg" toggleable="lg" type="dark" class="sticky-top">
-        <b-navbar-brand href="#/home">电影首页</b-navbar-brand>
+        <b-navbar-brand href="#">管理端</b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"/>
 
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <b-nav-item href="#/recommend/">推荐</b-nav-item>
-                <b-nav-item href="#" disabled>Disabled</b-nav-item>
+                <b-nav-item href="#/recommend/">用户管理</b-nav-item>
+                <b-nav-item href="#/recommend/">电影管理</b-nav-item>
             </b-navbar-nav>
 
             <Sidebar ref="sidebar"></Sidebar>
 
             <!-- Right aligned nav items -->
             <b-navbar-nav class="ml-auto">
-                <b-nav-form>
-                    <b-form-input size="sm" class="mr-sm-2" placeholder="在此搜索" v-model="searchText"/>
-                    <b-button size="sm" class="m-sm-0" @click="clickSearch()">
-                        <b-icon icon="search" scale="1.5"/>
-                    </b-button>
-                </b-nav-form>
-
                 <b-nav-item-dropdown right>
                     <!-- Using 'button-content' slot -->
                     <template v-slot:button-content>
@@ -37,7 +30,7 @@
 <script>
     import {mapActions} from "vuex";
     import {USER_SIGNOUT} from "@/store/user";
-    import Sidebar from "@/components/Common/Sidebar";
+    import Sidebar from "@/components/Common/User/Sidebar";
 
     export default {
         name: "Navbar",
@@ -69,12 +62,12 @@
                     url: "/api/movies/search",
                     data: {
                         "movieName": this.tempSearchText,
-                        "pageNo": this.$parent.currentPage
+                        "pageNo": this.$parent.$refs['pagination'].currentPage
                     }
                 })
             },
             searching () {
-                this.$parent.isSearch = true;
+                this.$parent.$refs['pagination'].isSearch = true;
                 let t = this.tempSearchText;
                 if (typeof t == "undefined" || t == null || t === "") {
                     this.$router.go(0);
@@ -83,7 +76,7 @@
                         this.searchCount(),
                         this.searchName()
                     ]).then(this.$axios.spread((response1, response2) => {
-                        this.$parent.pageSum = Math.ceil(response1.data / 24) * 20;
+                        this.$parent.$refs['pagination'].pageSum = Math.ceil(response1.data / 24) * 20;
                         this.$parent.movieList = response2.data;
                         this.$parent.getPoster();
                         this.$parent.getDetails();
