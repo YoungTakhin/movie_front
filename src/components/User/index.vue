@@ -20,7 +20,7 @@
                                         <p class="h6 text-left my-1 py-0"><strong>{{timestampToTime(movie.date)}}</strong></p>
                                         <p class="text-left my-1 py-0"><small>{{movieGenresList[i].join(' | ')}}</small></p>
                                         <p class="text-left my-1 py-0"><small>{{movieActorList[i].join(' | ')}}</small></p>
-                                        <p class="text-left"><small>{{movieOverviewList[i].substr(0, [150]) + '...'}}</small></p>
+                                        <p class="text-left"><small>{{movieOverviewList[i].substr(0, [100]) + '...'}}</small></p>
                                     </b-card-text>
                                 </b-card-body>
                             </b-col>
