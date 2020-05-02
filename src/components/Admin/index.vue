@@ -113,8 +113,7 @@
             <!-- Info modal -->
             <b-modal :id="infoModal.id" :title="infoModal.title" hide-footer @hide="resetInfoModal">
                 确定要更改密码吗？
-                <b-button class="mt-2" variant="primary" block @click="updatePassword(infoModal.userId)">确定</b-button>
-<!--                <pre>{{ infoModal.content }}</pre>-->
+                <b-button class="mt-2" variant="primary" block @click="updatePassword(infoModal.index, infoModal.userId)">确定</b-button>
             </b-modal>
 
             <b-modal ref="success" title="更改成功" header-bg-variant="success" header-text-variant="text" class="text-center">
@@ -153,8 +152,9 @@
                 filter: null,
                 infoModal: {
                     id: 'info-modal',
+                    index: 0,
                     title: '',
-                    content: ''
+                    userId: ''
                 },
             }
         },
@@ -167,7 +167,7 @@
                 }
             },
             currentPage: function () {
-                this.getUsers();
+                this.search();
             }
         },
         methods: {
@@ -180,7 +180,7 @@
             // 获取用户总数
             getUserCount() {
                 this.$axios.get('/api/users/count').then((response) => {
-                    this.pageSum = Math.ceil(response.data / this.perPage) * 20;
+                    this.pageSum = Math.ceil(response.data / this.perPage) * this.perPage;
                 })
             },
             setFilter(index) {
@@ -197,11 +197,12 @@
                 if (this.filter === '' || this.filter == null) {
                     this.getUserCount();
                     this.getUsers();
-                } else if (this.dropdown === 1 && typeof(this.filter) !== 'string') {
+                } else if (this.dropdown === 1) {
                     this.$axios.get('/api/user/'+this.filter).then((response)=>{
                         this.users = [
                             response.data
                         ];
+                        this.pageSum = Math.ceil(response.data / this.perPage) * this.perPage;
                     }).catch(() => {
                         this.users = [];
                     })
@@ -213,9 +214,7 @@
                             userName: this.filter
                         }
                     }).then((response) => {
-                        this.pageSum = Math.ceil(response.data / this.perPage) * 20;
-                        console.log(this.filter);
-                        console.log(this.pageSum);
+                        this.pageSum = Math.ceil(response.data / this.perPage) * this.perPage;
                     });
                     this.$axios.get('/api/' + this.currentPage + '/users/' + this.perPage + '/' + this.filter).then((response)=>{
                         this.users = response.data;
@@ -227,24 +226,26 @@
                 }
             },
             info(item, index, button) {
-                this.infoModal.userId = index;
-                this.infoModal.title = `用户: ${index} 更改密码`;
-                this.infoModal.content = JSON.stringify(item, null, 2);
+                this.infoModal.index = index;
+                this.infoModal.title = `用户: ${item.userId} 更改密码`;
+                this.infoModal.userId = item.userId;
                 this.$root.$emit('bv::show::modal', this.infoModal.id, button);
             },
             resetInfoModal() {
+                this.infoModal.index = null;
                 this.infoModal.title = '';
-                this.infoModal.content = '';
+                this.infoModal.userId = '';
             },
             // 更改密码
-            updatePassword(userId) {
-                if (this.users[userId].password.length >= 6 && this.users[userId].password.length <= 16) {
+            updatePassword(index, userId) {
+                console.log(this.users[index].password);
+                if (this.users[index].password.length >= 6 && this.users[index].password.length <= 16) {
                     this.$axios({
                         method: "POST",
                         url: "/api/user/password",
                         data: {
                             "userId": userId,
-                            "password": this.users[userId].password
+                            "password": this.users[index].password
                         }
                     }).then(() => {
                         this.$refs['success'].show();
@@ -255,7 +256,7 @@
         mounted() {
             this.getUsers();
             this.getUserCount();
-        },
+        }
     }
 </script>
 

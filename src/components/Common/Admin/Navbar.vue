@@ -6,8 +6,8 @@
 
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <b-nav-item href="#/recommend/">用户管理</b-nav-item>
-                <b-nav-item href="#/recommend/">电影管理</b-nav-item>
+                <b-nav-item href="#/admin/">用户管理</b-nav-item>
+                <b-nav-item href="#/movie/">电影管理</b-nav-item>
             </b-navbar-nav>
 
             <Sidebar ref="sidebar"></Sidebar>
@@ -34,7 +34,9 @@
 
     export default {
         name: "Navbar",
-        components: {Sidebar},
+        components: {
+            Sidebar
+        },
         data () {
             return {
                 searchText: '',

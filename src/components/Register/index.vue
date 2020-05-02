@@ -1,5 +1,5 @@
 <template>
-    <div id="bg" class="">
+    <div>
         <div>
             <b-carousel
                     id="carousel-fade"
@@ -17,59 +17,62 @@
         </div>
 
         <b-row align-h="center" class="h-100 fixed-top">
-            <b-col id="loginBox" cols="auto" align-self="center" class="">
+            <b-col id="loginBox" cols="auto" align-self="center" class="border" >
                 <div class="col-12 p-4 text-left">
-                    <h1 class="text-light text-center">欢迎回来!</h1>
-                    <h4 class="text-light text-center">很高兴再见到你</h4>
+                    <h1 class="text-light text-center">创建一个账号</h1>
                     <div class="form-group">
-                        <label for="userName" class="text-light">用户名</label>
-                        <input type="text" class="form-control" id="userName" placeholder="请输入用户名" v-model="userName">
+                        <label for="username" class="text-light">用户名</label>
+                        <input type="text" class="form-control" id="username" placeholder="请输入用户名" v-model="username">
+                        <small v-if="registerError" id="" class="form-text text-danger">该用户名不可用</small>
                     </div>
                     <div class="form-group">
                         <label for="password" class="text-light">密码</label>
                         <input type="password" class="form-control" id="password" placeholder="请输入密码" v-model="password">
                     </div>
-                    <button type="button" class="btn btn-primary col-12" @click="login">现在登陆</button>
-                    <small v-if="loginError" id="" class="form-text text-danger">用户名或密码错误</small>
+                    <button type="button" class="btn btn-primary col-12" @click="register">现在登陆</button>
                     <div class="mt-3">
-                        <label for="password" class="text-light">需要新的账号？</label>
-                        <b-link href="/#/register">现在注册</b-link>
+                        <b-link href="/#/login">已有拥有账号？</b-link>
                     </div>
                 </div>
             </b-col>
         </b-row>
     </div>
 </template>
+
 <script>
     import { mapActions } from 'vuex'
     import { USER_SIGNIN }from '../../store/user'
     export default {
-        name: "Login",
+        name: "Register",
         data () {
             return {
+                username: '',
+                password: '',
+
                 backgroundImg: '',
                 bgList: [],
 
-                userName: '',
-                password: '',
-
-                loginError: false
+                registerError: false
             }
+        },
+        watch: {
+            username: function () {
+                this.registerError = false;
+            },
         },
         methods: {
             ...mapActions([USER_SIGNIN]),
-            login() {
+            register() {
                 this.$axios({
                     method: "POST",
-                    url: "/api/login",
+                    url: "/api/register",
                     data: {
-                        "userName": this.userName,
+                        "userName": this.username,
                         "password": this.password
                     }
                 }).then((response) => {
                     if (response.data === null) {
-                        this.loginError = true;
-                        window.console.log("用户名或密码错误");
+                        this.registerError = true;
                     } else if (response.data.admin === true) {
                         this.USER_SIGNIN(response.data);
                         this.$router.push("/admin")

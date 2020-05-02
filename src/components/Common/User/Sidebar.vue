@@ -11,49 +11,13 @@
                     <dd class="col-8">{{user.userName}}</dd>
                 </dl>
 
-<!--                <label>您的ID：</label>-->
-<!--                <b-input-group for="id">-->
-<!--                    <b-form-input id="id" aria-label="Small text input with custom switch"></b-form-input>-->
-<!--                    <b-input-group-append is-text>-->
-<!--                        <b-form-checkbox switch class="mr-n2 mb-n1">-->
-<!--                            <span class="sr-only">Checkbox for previous text input</span>-->
-<!--                        </b-form-checkbox>-->
-<!--                    </b-input-group-append>-->
-<!--                </b-input-group>-->
-<!--                <div>-->
-<!--                    <b-badge variant="info" class="mb-3">点击右边开关修改</b-badge>-->
-<!--                </div>-->
-
-<!--                <label>您的用户名：</label>-->
-<!--                <b-input-group for="username">-->
-<!--                    <b-form-input id="username" :value=user.userName v-model=user.userName></b-form-input>-->
-<!--                    <b-input-group-append is-text>-->
-<!--                        <b-form-checkbox switch class="mr-n2 mb-n1">-->
-<!--                            <span class="sr-only">Checkbox for previous text input</span>-->
-<!--                        </b-form-checkbox>-->
-<!--                    </b-input-group-append>-->
-<!--                </b-input-group>-->
-<!--                <div>-->
-<!--                    <b-badge variant="info" class="mb-3">点击右边开关修改</b-badge>-->
-<!--                </div>-->
-
-<!--                <label>您的密码：</label>-->
-<!--                <b-input-group for="id">-->
-<!--                    <b-form-input id="id" aria-label="Small text input with custom switch"></b-form-input>-->
-<!--                    <b-input-group-append is-text>-->
-<!--                        <b-form-checkbox switch class="mr-n2 mb-n1">-->
-<!--                            <span class="sr-only">Checkbox for previous text input</span>-->
-<!--                        </b-form-checkbox>-->
-<!--                    </b-input-group-append>-->
-<!--                </b-input-group>-->
-<!--                <div>-->
-<!--                    <b-badge variant="info" class="mb-3">点击右边开关修改</b-badge>-->
-<!--                </div>-->
-                <p>
-                    Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
-                    in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-                </p>
-                <b-img src="https://picsum.photos/500/500/?image=54" fluid thumbnail></b-img>
+                <label>修改密码：</label>
+                <b-input-group for="password">
+                    <b-form-input type="password" id="password" v-model="user.password"></b-form-input>
+                    <b-input-group-append>
+                        <b-button @click="updatePassword(localStorage.getItem('userId'))">修改</b-button>
+                    </b-input-group-append>
+                </b-input-group>
             </div>
         </b-sidebar>
     </div>
@@ -70,6 +34,24 @@
         methods: {
             getUser() {
                 this.user = JSON.parse(localStorage.getItem("user"));
+            },
+            updatePassword(userId) {
+                if (this.users[userId].password.length >= 6 && this.users[userId].password.length <= 16) {
+                    this.$axios({
+                        method: "POST",
+                        url: "/api/user/password",
+                        data: {
+                            "userId": userId,
+                            "password": this.users[userId].password
+                        }
+                    }).then((response) => {
+                        if (response === 1) {
+                            this.$refs['success'].show();
+                        }
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+                }
             }
         },
         mounted() {

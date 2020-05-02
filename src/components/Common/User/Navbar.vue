@@ -69,7 +69,8 @@
                     url: "/api/movies/search",
                     data: {
                         "movieName": this.tempSearchText,
-                        "pageNo": this.$parent.$refs['pagination'].currentPage
+                        "pageNo": this.$parent.$refs['pagination'].currentPage,
+                        "perPage": 24
                     }
                 })
             },

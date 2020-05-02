@@ -8,7 +8,7 @@
             </b-container>
             <b-container v-else>
                 <b-card-group deck class="text-center">
-                    <b-card no-body class="text-white bg-dark overflow-hidden border-0 rounded-0 m-md-3 m-0" style="min-width: 320px;" v-for="movie in movieList" :key="i=movie.tmdbid">
+                    <b-card no-body class="text-white bg-dark overflow-hidden rounded-0 m-md-3 m-0 my-1 b-md-5 b-0" style="min-width: 400px;" v-for="movie in movieList" :key="i=movie.tmdbid">
                         <b-row no-gutters>
                             <b-col md="6" :id="'poster' + movie.tmdbid">
                                 <b-card-img-lazy v-if="moviePostList[i]" :src='moviePostList[i]' class="rounded-0"/>
