@@ -17,7 +17,7 @@
         </div>
 
         <b-row align-h="center" class="h-100 fixed-top">
-            <b-col id="loginBox" cols="auto" align-self="center" class="border" >
+            <b-col id="loginBox" cols="auto" align-self="center" class="rounded">
                 <div class="col-12 p-4 text-left">
                     <h1 class="text-light text-center">创建一个账号</h1>
                     <div class="form-group">
@@ -29,7 +29,7 @@
                         <label for="password" class="text-light">密码</label>
                         <input type="password" class="form-control" id="password" placeholder="请输入密码" v-model="password">
                     </div>
-                    <button type="button" class="btn btn-primary col-12" @click="register">现在登陆</button>
+                    <button type="button" class="btn btn-primary col-12" @click="register">注册并登陆</button>
                     <div class="mt-3">
                         <b-link href="/#/login">已有拥有账号？</b-link>
                     </div>

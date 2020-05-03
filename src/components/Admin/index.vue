@@ -25,7 +25,7 @@
                                     <b-dropdown-item @click="setFilter(1)">用户ID</b-dropdown-item>
                                     <b-dropdown-item @click="setFilter(2)">用户名</b-dropdown-item>
                                 </b-dropdown>
-                                <b-button variant="info" @click="search">搜索</b-button>
+                                <b-button variant="info" @click="search"><b-icon-search></b-icon-search></b-button>
                             </b-input-group-append>
                         </b-input-group>
                     </b-form-group>

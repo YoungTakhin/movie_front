@@ -25,7 +25,7 @@
                                     <b-dropdown-item @click="setFilter(1)">TMDB ID</b-dropdown-item>
                                     <b-dropdown-item @click="setFilter(2)">电影名</b-dropdown-item>
                                 </b-dropdown>
-                                <b-button variant="info" @click="search">搜索</b-button>
+                                <b-button variant="info" @click="search"><b-icon-search></b-icon-search></b-button>
                             </b-input-group-append>
                         </b-input-group>
                     </b-form-group>
@@ -61,7 +61,7 @@
             </b-row>
 
             <b-col>
-                <b-button @click="showModal">添加电影</b-button>
+                <b-button @click="showModal" variant="primary" class="mb-1">添加电影</b-button>
             </b-col>
 
             <!-- Main table element -->
@@ -82,10 +82,10 @@
                 </template>
                 <template v-slot:cell(操作)="row">
                     <b-button size="sm" @click="row.toggleDetails" class="mr-1" variant="info">
-                        <b-icon-pencil-square></b-icon-pencil-square>
+                        <b-icon-eye></b-icon-eye>
                     </b-button>
                     <b-button size="sm" @click="deleteMovie(row.item, row.index)" class="mr-1" variant="danger">
-                        <b-icon-x-square></b-icon-x-square>
+                        <b-icon-trash></b-icon-trash>
                     </b-button>
                 </template>
 
@@ -93,21 +93,43 @@
                     <b-card>
                         <b-form-group
                                 label-cols-lg="3"
-                                label="更改密码"
+                                label="详细信息"
                                 label-size="lg"
                                 label-class="font-weight-bold pt-0"
-                                class="mb-0"
+                                class="mx-0"
                         >
-                            <b-form-group
-                                    label-cols-sm="3"
-                                    label="密码"
-                                    label-align-sm="right"
-                                    label-for="password"
-                            >
-                                <b-form-input type="password" v-model.trim="row.item.password"></b-form-input>
-                            </b-form-group>
-                            <b-form-group class="text-right">
-                                <b-button variant="primary" @click="info(row.item, row.index, $event.target)">确认修改</b-button>
+                            <b-form-group>
+                                <b-row class="mb-2">
+                                    <b-col sm="3" class="text-sm-right"><b>制作成本:</b></b-col>
+                                    <b-col>{{ row.item.budget }}</b-col>
+                                </b-row>
+                                <b-row class="mb-2">
+                                    <b-col sm="3" class="text-sm-right"><b>票房:</b></b-col>
+                                    <b-col>{{ row.item.revenue }}</b-col>
+                                </b-row>
+                                <b-row class="mb-2">
+                                    <b-col sm="3" class="text-sm-right"><b>TMDB评分:</b></b-col>
+                                    <b-col>
+                                        <b-form-rating
+                                                v-model="row.item.vote"
+                                                icon-empty="heart"
+                                                icon-half="heart-half"
+                                                icon-full="heart-fill"
+                                                icon-clear="slash-circle"
+                                                show-clear
+                                                variant="danger"
+                                                readonly
+                                                show-value
+                                                show-value-max
+                                                stars="10"
+                                                size="sm"
+                                        ></b-form-rating>
+                                    </b-col>
+                                </b-row>
+                                <b-row class="mb-2">
+                                    <b-col sm="3" class="text-sm-right"><b>TMDB评分人数:</b></b-col>
+                                    <b-col>{{ row.item.vote_count }}</b-col>
+                                </b-row>
                             </b-form-group>
                         </b-form-group>
                     </b-card>
@@ -115,18 +137,20 @@
             </b-table>
 
             <!-- Info modal -->
-            <b-modal :id="infoModal.id" :title="infoModal.title" hide-footer @hide="resetInfoModal">
-                确定要更改电影信息吗？
-                <b-button class="mt-2" variant="primary" block @click="updatePassword(infoModal.userId)">确定</b-button>
-            </b-modal>
-
-            <b-modal ref="delete-Modal" :title="deleteModal.title" hide-footer @hide="resetDeleteModal">
+            <b-modal @ok="deleting(deleteModal.tmdbId)" ref="delete-Modal" :title="deleteModal.title" @hide="resetDeleteModal">
                 确定要删除电影吗？
-                <b-button class="mt-2" variant="primary" block @click="deleting(deleteModal.tmdbId)">确定</b-button>
             </b-modal>
 
-            <b-modal ref="success" title="更改成功" header-bg-variant="success" header-text-variant="text" class="text-center">
-                <p class="my-4">更改密码成功！</p>
+            <b-modal @ok="reload" ref="success" title="删除成功" header-bg-variant="success" header-text-variant="text" class="text-center">
+                <p class="my-4">删除电影成功！</p>
+            </b-modal>
+
+            <b-modal @ok="reload" id="success-insert" ref="success-insert" title="新增成功" header-bg-variant="success" header-text-variant="text" class="text-center">
+                <p class="my-4">新增电影成功！</p>
+            </b-modal>
+
+            <b-modal id="error-insert" ref="error-insert" title="新增失败" header-bg-variant="danger" header-text-variant="text" class="text-center">
+                <p class="my-4">新增电影失败！请检查信息</p>
             </b-modal>
         </b-container>
 
@@ -389,18 +413,17 @@
                     this.movies = [];
                 }
             },
-            deleting() {
-
-            },
-            info(item, index, button) {
-                this.infoModal.userId = index;
-                this.infoModal.title = `用户: ${index} 更改密码`;
-                this.infoModal.content = JSON.stringify(item, null, 2);
-                this.$root.$emit('bv::show::modal', this.infoModal.id, button);
+            deleting(tmdbid) {
+                this.$axios({
+                    method: 'POST',
+                    url: '/api/movie/delete/' + tmdbid,
+                }).then((response) => {
+                    if (response.data === 1) {
+                        this.$refs['success'].show();
+                    }
+                })
             },
             deleteMovie(item, index) {
-                console.log(item.tmdbid);
-                console.log(index);
                 this.deleteModal.index = index;
                 this.deleteModal.title = `删除电影: ${item.tmdbid}`;
                 this.deleteModal.tmdbId = item.tmdbid;
@@ -449,21 +472,23 @@
                         vote: this.insertMovie.vote,
                         count: this.insertMovie.count,
                     }
-                }).then((response)=>{
+                }).then((response) => {
                     if (response.data === 1) {
-                        alert(1)
+                        this.$refs['success-insert'].show();
                     } else {
-                        alert(0)
+                        this.$refs['error-insert'].show();
                     }
                 }).catch(() => {
-                    alert(0)
+                    this.$refs['error-insert'].show();
                 })
+            },
+            reload() {
+                location.reload()
             }
         },
         mounted() {
             this.getMovieCount();
             this.getMovies();
-
         }
     }
 </script>

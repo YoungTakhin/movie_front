@@ -17,7 +17,7 @@
         </div>
 
         <b-row align-h="center" class="h-100 fixed-top">
-            <b-col id="loginBox" cols="auto" align-self="center" class="">
+            <b-col id="loginBox" cols="auto" align-self="center" class="rounded">
                 <div class="col-12 p-4 text-left">
                     <h1 class="text-light text-center">欢迎回来!</h1>
                     <h4 class="text-light text-center">很高兴再见到你</h4>

@@ -8,20 +8,19 @@
             </b-container>
             <b-container v-else>
                 <b-card-group deck class="text-center">
-                    <b-card no-body border-variant="light" class="text-white bg-dark overflow-hidden rounded-0 m-md-3 m-0 my-1 b-md-5 b-0" style="min-width: 400px; border-width: 10px;" v-for="movie in movieList" :key="i=movie.tmdbid">
+                    <b-card no-body border-variant="light" class="text-white bg-dark overflow-hidden rounded-2 m-md-3 m-0 my-1 b-md-5 b-0" style="min-width: 400px; border-width: 10px;" v-for="movie in movieList" :key="movie.tmdbid">
                         <b-row no-gutters @click="ratingModel(movie.tmdbid, movie.title)">
                             <b-col md="6" :id="'poster' + movie.tmdbid">
-                                <b-card-img-lazy v-if="moviePostList[i]" :src='moviePostList[i]' class="rounded-0"/>
+                                <b-card-img-lazy v-if="moviePostList[movie.tmdbid]" :src="moviePostList[movie.tmdbid]" class="rounded-0"/>
                                 <b-card-img-lazy v-else src="https://www.themoviedb.org/assets/1/v4/logos/primary-green-d70eebe18a5eb5b166d5c1ef0796715b8d1a2cbc698f96d311d62f894ae87085.svg" />
                             </b-col>
                             <b-col md="6">
                                 <b-card-body :title="movie.title" class="py-1 my-1">
-                                    <b-card-text v-if="movieActorList[i]&&movieGenresList[i]">
-                                        <p>{{movie.date}}</p>
+                                    <b-card-text v-if="movieActorList[movie.tmdbid]&&movieGenresList[movie.tmdbid]">
                                         <p class="h6 text-left my-1 py-0"><strong>{{timestampToTime(movie.date)}}</strong></p>
-                                        <p class="text-left my-1 py-0"><small>{{movieGenresList[i].join(' | ')}}</small></p>
-                                        <p class="text-left my-1 py-0"><small>{{movieActorList[i].join(' | ')}}</small></p>
-                                        <p class="text-left"><small>{{movieOverviewList[i].substr(0, [100]) + '...'}}</small></p>
+                                        <p class="text-left my-1 py-0"><small>{{movieGenresList[movie.tmdbid].join(' | ')}}</small></p>
+                                        <p class="text-left my-1 py-0"><small>{{movieActorList[movie.tmdbid].join(' | ')}}</small></p>
+                                        <p class="text-left"><small>{{movieOverviewList[movie.tmdbid].substr(0, [100]) + '...'}}</small></p>
                                     </b-card-text>
                                 </b-card-body>
                             </b-col>
@@ -34,29 +33,23 @@
             <Pagination ref='pagination' />
         </b-col>
 
-        <b-modal centered ref="modal-rating" :title="model.title" @ok="addRating(model.tmdbid)" @close="closeRating">
-            <b-img-lazy center :src='moviePostList[model.tmdbid]' class="text-center"/>
-
-            <b-card no-body border-variant="light" class="text-white bg-dark overflow-hidden rounded-0 m-md-3 m-0 my-1 b-md-5 b-0" style="min-width: 400px; border-width: 10px;">
-                <b-row no-gutters @click="ratingModel(model.tmdbid, model.title)">
-                    <b-col md="6" :id="'poster' + model.tmdbid">
-                        <b-card-img-lazy v-if="moviePostList[model.tmdbid]" :src='moviePostList[model.tmdbid]' class="rounded-0"/>
-                        <b-card-img-lazy v-else src="https://www.themoviedb.org/assets/1/v4/logos/primary-green-d70eebe18a5eb5b166d5c1ef0796715b8d1a2cbc698f96d311d62f894ae87085.svg" />
-                    </b-col>
-                    <b-col md="6">
-                        <b-card-body :title="model.title" class="py-1 my-1">
-                            <b-card-text v-if="movieActorList[i]&&movieGenresList[model.tmdbid]">
-                                <p class="h6 text-left my-1 py-0"><strong>{{timestampToTime(model.date)}}</strong></p>
-                                <p class="text-left my-1 py-0"><small>{{movieGenresList[model.tmdbid].join(' | ')}}</small></p>
-                                <p class="text-left my-1 py-0"><small>{{movieActorList[model.tmdbid].join(' | ')}}</small></p>
-                            </b-card-text>
-                        </b-card-body>
-                    </b-col>
-                </b-row>
+        <b-modal centered hide-header ref="modal-rating" :title="model.title" @ok="addRating(model.tmdbid)" @close="closeRating">
+            <h3>{{ model.title }}</h3>
+            <b-card-text v-if="movieActorList[model.tmdbid]&&movieGenresList[model.tmdbid]">
+                {{model.date}}
+                <p class="text-left my-1 py-0"><small>{{movieGenresList[model.tmdbid].join(' | ')}}</small></p>
+                <p class="text-left my-1 py-0"><small>{{movieActorList[model.tmdbid].join(' | ')}}</small></p>
+            </b-card-text>
+            <b-card no-body border-variant="light" class="text-white bg-dark overflow-hidden rounded-0" style="min-width: 400px; border-width: 10px;">
+                <b-embed
+                        type="iframe"
+                        aspect="16by9"
+                        :src="video"
+                        allowfullscreen
+                ></b-embed>
             </b-card>
 
             <p class="my-4">{{movieOverviewList[model.tmdbid]}}</p>
-            <p class="my-4">{{ model.tmdbid }}</p>
 
             <b-input-group>
                 <b-input-group-prepend>
@@ -93,9 +86,9 @@
                     title: ""
                 },
 
-                isHovered: false,
+                value: 0,
 
-                value: 0
+                video: ''
             }
         },
         components: {
@@ -118,12 +111,11 @@
                 this.loading = true;
                 this.$axios({
                     method: "GET",
-                    url: "/api/" + this.$refs['pagination'].currentPage + "/movies/" + "24",
+                    url: "/api/" + this.$refs['pagination'].currentPage + "/movies/" + 24,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).then((response) => {
-                    //window.console.log(response.data);
                     this.movieList = response.data;
                     this.getPoster();
                     this.getDetails();
@@ -178,9 +170,28 @@
             },
             // 评分
             ratingModel (tmdbid, title) {
+                this.video='';
                 this.model.title = title;
                 this.model.tmdbid = tmdbid;
                 this.$refs['modal-rating'].show();
+
+                // 加载预告片
+                this.$axios({
+                    method: 'GET',
+                    url: 'https://api.themoviedb.org/3/movie/'+tmdbid+'/videos',
+                    params: {
+                        api_key: this.$global_msg.api_key
+                    }
+                }).then((response) => {
+                    console.log(response.data.results);
+                    for (let v of response.data.results) {
+                        if (v.site === "YouTube") {
+                            this.video = 'https://www.youtube.com/embed/' + v.key + '?autoplay=1';
+                            break;
+                        }
+                        console.log(this.video)
+                    }
+                })
             },
             // 用户为电影评分
             addRating(tmdbId) {
@@ -200,9 +211,6 @@
             },
             closeRating() {
                 this.value = 0
-            },
-            hover(hovered) {
-                this.isHovered = hovered;
             }
         },
         created () {

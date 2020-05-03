@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-sidebar id="sidebar" title="个人中心" right shadow lazy>
+        <b-sidebar id="sidebar" title="个人中心" right lazy backdrop>
             <div class="px-2 py-2 text-left">
                 <dl class="row">
                     <dt class="col-4">ID:</dt>
